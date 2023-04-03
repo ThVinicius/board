@@ -3,26 +3,19 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useState } from 'react'
 
-import { collection, getDocs } from 'firebase/firestore/lite'
-import db from 'services/firebaseConnection'
+import { User } from '@prisma/client'
+import { prisma } from 'lib/prisma'
 
 import styles from 'styles/styles.module.scss'
 
 import boarUser from '../../public/images/board-user.svg'
 
-type Data = {
-  id: string
-  donate: boolean
-  lastDonate: Date
-  image: string
-}
-
 interface HomeProps {
-  data: string
+  data: User[]
 }
 
 export default function Home({ data }: HomeProps) {
-  const [donaters] = useState<Data[]>(JSON.parse(data))
+  const [donaters] = useState<User[]>(data)
 
   return (
     <>
@@ -59,17 +52,7 @@ export default function Home({ data }: HomeProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const usersCol = collection(db, 'users')
-  const donaters = await getDocs(usersCol)
-
-  const data = JSON.stringify(
-    donaters.docs.map(u => {
-      return {
-        id: u.id,
-        ...u.data()
-      }
-    })
-  )
+  const data = await prisma.user.findMany()
 
   return {
     props: {
