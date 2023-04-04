@@ -11,11 +11,11 @@ import styles from 'styles/styles.module.scss'
 import boarUser from '../../public/images/board-user.svg'
 
 interface HomeProps {
-  data: User[]
+  data: string
 }
 
 export default function Home({ data }: HomeProps) {
-  const [donaters] = useState<User[]>(data)
+  const [donaters] = useState<User[]>(JSON.parse(data))
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function Home({ data }: HomeProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const data = await prisma.user.findMany()
+  const data = JSON.stringify(await prisma.user.findMany())
 
   return {
     props: {
